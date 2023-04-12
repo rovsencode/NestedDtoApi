@@ -4,6 +4,7 @@ using P326FirstWebAPI.DAL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using P326FirstWebAPI.Extentions;
+using AutoMapper;
 
 namespace P326FirstWebAPI.Controllers
 {
@@ -13,14 +14,16 @@ namespace P326FirstWebAPI.Controllers
     {
             private readonly AppDbContext _context;
             private readonly IWebHostEnvironment _env;
+            private readonly IMapper _mapper;
 
-            public CategoryController(AppDbContext context, IWebHostEnvironment env)
-            {
-                _context = context;
-                _env = env;
-            }
+        public CategoryController(AppDbContext context, IWebHostEnvironment env, IMapper mapper)
+        {
+            _context = context;
+            _env = env;
+            _mapper = mapper;
+        }
 
-            [HttpGet]
+        [HttpGet]
             public IActionResult GetAll(int page, string search)
             {
                 var query = _context.Categories
@@ -61,14 +64,16 @@ namespace P326FirstWebAPI.Controllers
                     .Where(p => !p.IsDelete)
                     .FirstOrDefault(x => x.Id == id);
                 if (category == null) return StatusCode(StatusCodes.Status404NotFound);
-                CategoryReturnDto categoryReturnDto = new()
-                {
-                    Name = category.Name,
-                    Description = category.Description,
-                    CreateDate = category.CreatedTime,
-                    UpdateDate = category.UpdateTime,
-                    ImageUrl = "https://localhost:7076/img/" + category.ImageUrl
-                };
+            CategoryReturnDto categoryReturnDto= _mapper.Map<CategoryReturnDto>(category);
+      
+                //CategoryReturnDto categoryReturnDto = new()
+                //{
+                //    Name = category.Name,
+                //    Description = category.Description,
+                //    CreateDate = category.CreatedTime,
+                //    UpdateDate = category.UpdateTime,
+                //    ImageUrl = "https://localhost:7076/img/" + category.ImageUrl
+                //};
 
                 return Ok(categoryReturnDto);
             }

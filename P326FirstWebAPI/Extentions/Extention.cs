@@ -23,5 +23,9 @@
                 }
                 return fileName;
             }
+        public static  int CalculateAge(this DateTime time)
+        {
+            return DateTime.Now.Day - time.Day;
+        }
         }
     }

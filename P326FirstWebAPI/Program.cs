@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using P326FirstWebAPI.DAL;
 using P326FirstWebAPI.Dtos.ProductDtos;
+using P326FirstWebAPI.Profiles;
 
 namespace P326FirstWebAPI
 {
@@ -22,7 +23,10 @@ namespace P326FirstWebAPI
             {
                 options.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
             });
-
+            builder.Services.AddAutoMapper(opt =>
+            {
+                opt.AddProfile(new MapperProfile());
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -6,6 +6,7 @@
         public double SalePrice { get; set; }
         public double CostPrice { get; set; }
         public bool IsActive { get; set; }
+        public double Profit { get; set; }
         public CategoryInProductReturnDto Category { get; set; }
 
     }

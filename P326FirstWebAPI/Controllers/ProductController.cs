@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using P326FirstWebAPI.DAL;
@@ -11,11 +12,14 @@ namespace P326FirstWebAPI.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly AppDbContext _appDbContext;
 
-        public ProductController(AppDbContext appDbContext)
+        private readonly AppDbContext _appDbContext;
+        private readonly IMapper _mapper;
+
+        public ProductController(AppDbContext appDbContext, IMapper mapper)
         {
             _appDbContext = appDbContext;
+            _mapper = mapper;
         }
         [Route("GetAll")]
         [HttpGet]
@@ -54,20 +58,29 @@ namespace P326FirstWebAPI.Controllers
             Product product = _appDbContext.Products.Where(p=>p.IsDelete)
                 .Include(p=>p.Category).FirstOrDefault(p => p.Id == id);
             if (product == null) return StatusCode(StatusCodes.Status404NotFound);
-            ProductReturnDto productReturnDto = new() {
-                Name=product.Name,
-                CostPrice=product.CostPrice,
-                SalePrice=product.SalePrice,
-                IsActive=product.IsActive,
-                Category = new() 
-                { Name=product.Category.Name,
-                  Id=product.Category.Id,
+
+            ProductReturnDto productReturnDto= _mapper.Map<ProductReturnDto>(product);
+            return Ok(productReturnDto);
+           
+        }
+
+
+        private ProductReturnDto MapToProductReturnDto(Product product)
+        {
+            ProductReturnDto productReturnDto = new()
+            {
+                Name = product.Name,
+                CostPrice = product.CostPrice,
+                SalePrice = product.SalePrice,
+                IsActive = product.IsActive,
+                Category = new()
+                {
+                    Name = product.Category.Name,
+                    Id = product.Category.Id,
                 }
 
             };
-
-            return Ok(productReturnDto);
-           
+            return productReturnDto;
         }
         [HttpPost]
         public IActionResult AddProduct(ProductCreatedDto productCreatedDto)
